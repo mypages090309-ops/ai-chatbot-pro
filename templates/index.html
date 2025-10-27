@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AI Chatbot Pro</title>
+  <style>
+    body{background:#0f172a;color:#e5e7eb;font-family:Arial,Helvetica,sans-serif;margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px}
+    .chat{width:420px;height:520px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:12px;overflow:auto}
+    .msg{margin:8px 0;max-width:85%}
+    .me{margin-left:auto;text-align:right;color:#38bdf8}
+    .bot{color:#facc15}
+    .bar{display:flex;gap:8px}
+    input{flex:1;padding:10px;border-radius:8px;border:1px solid #334155;background:#0b1220;color:#e5e7eb}
+    button{padding:10px 14px;border-radius:8px;border:1px solid #334155;background:#111827;color:#e5e7eb;cursor:pointer}
+  </style>
+</head>
+<body>
+  <h2>🤖 AI Chatbot Pro</h2>
+  <div id="chat" class="chat">
+    <div class="msg bot">Hi! Type “book” to start scheduling.</div>
+  </div>
+  <div class="bar" style="width:420px;">
+    <input id="inp" placeholder="Type your message…"/>
+    <button id="send">Send</button>
+  </div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const inp = document.getElementById('inp');
+    const send = document.getElementById('send');
+
+    function add(text, who='me'){
+      const d = document.createElement('div');
+      d.className = 'msg ' + (who==='me'?'me':'bot');
+      d.textContent = (who==='me'?'You: ':'Bot: ') + text;
+      chat.appendChild(d);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function go(){
+      const message = inp.value.trim();
+      if(!message) return;
+      add(message, 'me');
+      inp.value = '';
+      const res = await fetch('/chat', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ user:'Rodolfo', message })
+      });
+      const data = await res.json();
+      add(data.reply, 'bot');
+    }
+
+    send.onclick = go;
+    inp.addEventListener('keydown', e => { if(e.key==='Enter') go(); });
+  </script>
+</body>
+</html>

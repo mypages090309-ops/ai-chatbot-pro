@@ -5,22 +5,29 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>AI Chatbot Pro</title>
   <style>
-    body{background:#0f172a;color:#e5e7eb;font-family:Arial,Helvetica,sans-serif;margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px}
-    .chat{width:420px;height:520px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:12px;overflow:auto}
+    :root{--bg:#0f172a;--panel:#1e293b;--text:#e5e7eb;--edge:#334155;--me:#38bdf8;--bot:#facc15}
+    *{box-sizing:border-box}
+    body{background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;
+         margin:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px}
+    h2{margin:8px 0 2px}
+    .chat{width:420px;max-width:92vw;height:520px;background:var(--panel);border:1px solid var(--edge);
+          border-radius:12px;padding:12px;overflow:auto}
     .msg{margin:8px 0;max-width:85%}
-    .me{margin-left:auto;text-align:right;color:#38bdf8}
-    .bot{color:#facc15}
-    .bar{display:flex;gap:8px}
-    input{flex:1;padding:10px;border-radius:8px;border:1px solid #334155;background:#0b1220;color:#e5e7eb}
-    button{padding:10px 14px;border-radius:8px;border:1px solid #334155;background:#111827;color:#e5e7eb;cursor:pointer}
+    .me{margin-left:auto;text-align:right;color:var(--me)}
+    .bot{color:var(--bot)}
+    .bar{display:flex;gap:8px;width:420px;max-width:92vw}
+    input{flex:1;padding:10px;border-radius:8px;border:1px solid var(--edge);
+          background:#0b1220;color:var(--text)}
+    button{padding:10px 14px;border-radius:8px;border:1px solid var(--edge);
+           background:#111827;color:var(--text);cursor:pointer}
   </style>
 </head>
 <body>
   <h2>🤖 AI Chatbot Pro</h2>
   <div id="chat" class="chat">
-    <div class="msg bot">Hi! Type “book” to start scheduling.</div>
+    <div class="msg bot">Hi! Type “hello”, “book”, or “price” to try me.</div>
   </div>
-  <div class="bar" style="width:420px;">
+  <div class="bar">
     <input id="inp" placeholder="Type your message…"/>
     <button id="send">Send</button>
   </div>
@@ -43,13 +50,17 @@
       if(!message) return;
       add(message, 'me');
       inp.value = '';
-      const res = await fetch('/chat', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ user:'Rodolfo', message })
-      });
-      const data = await res.json();
-      add(data.reply, 'bot');
+      try{
+        const res = await fetch('/chat', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ user:'Rodolfo', message })
+        });
+        const data = await res.json();
+        add(data.reply ?? 'No reply', 'bot');
+      }catch(e){
+        add('Oops, cannot reach the server.', 'bot');
+      }
     }
 
     send.onclick = go;
